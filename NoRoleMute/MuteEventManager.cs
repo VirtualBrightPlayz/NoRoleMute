@@ -25,16 +25,17 @@ namespace NoRoleMute
             while (true)
             {
                 yield return Timing.WaitForSeconds(1f);
-                Log.Debug("Mute Time?");
+                //Log.Debug("Mute Time?");
                 if (isMuteTime)
                 {
-                    Log.Debug("Yes");
+                    //Log.Debug("Yes");
                     MuteThem();
                 }
                 else
                 {
-                    Log.Debug("No");
-                    UnmuteThem();
+                    break;
+                    //Log.Debug("No");
+                    //UnmuteThem();
                 }
             }
         }
@@ -63,8 +64,8 @@ namespace NoRoleMute
                         ply.GetComponent<ReferenceHub>().Unmute();
                         ply.GetComponent<ReferenceHub>().characterClassManager.Muted = false;
                         ply.GetComponent<ReferenceHub>().characterClassManager.SetMuted(false);
-                        ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
                         notActualMutedPlayers.Remove(ply.GetComponent<ReferenceHub>().GetUserId());
+                        ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
                     }
                 }
                 catch (NullReferenceException e)
@@ -153,6 +154,7 @@ namespace NoRoleMute
         {
             isMuteTime = true;
             MuteThem();
+            Timing.RunCoroutine(CheckMuteLateCont());
         }
     }
 }
