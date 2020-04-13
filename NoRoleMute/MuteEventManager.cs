@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using EXILED;
 using EXILED.Extensions;
+using MEC;
 
 namespace NoRoleMute
 {
@@ -9,13 +10,33 @@ namespace NoRoleMute
     {
         public MutePlugin plugin;
         public static List<string> notActualMutedPlayers = new List<string>();
-        bool isMuteTime = false;
+        bool isMuteTime = true;
 
         public MuteEventManager(MutePlugin pl)
         {
             plugin = pl;
             if (notActualMutedPlayers == null)
                 notActualMutedPlayers = new List<string>();
+            Timing.RunCoroutine(CheckMuteLateCont());
+        }
+
+        private IEnumerator<float> CheckMuteLateCont()
+        {
+            while (true)
+            {
+                yield return Timing.WaitForSeconds(1f);
+                Log.Debug("Mute Time?");
+                if (isMuteTime)
+                {
+                    Log.Debug("Yes");
+                    MuteThem();
+                }
+                else
+                {
+                    Log.Debug("No");
+                    UnmuteThem();
+                }
+            }
         }
 
         internal void RoundEnd()
@@ -34,12 +55,20 @@ namespace NoRoleMute
         {
             foreach (var ply in PlayerManager.players)
             {
-                if (notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()))
+                try
                 {
-                    Log.Debug("Unmuting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role and were muted by this plugin.");
-                    ply.GetComponent<ReferenceHub>().Unmute();
-                    ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
-                    notActualMutedPlayers.Remove(ply.GetComponent<ReferenceHub>().GetUserId());
+                    if (notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()))
+                    {
+                        //Log.Debug("Unmuting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role and were muted by this plugin.");
+                        ply.GetComponent<ReferenceHub>().Unmute();
+                        ply.GetComponent<ReferenceHub>().characterClassManager.Muted = false;
+                        ply.GetComponent<ReferenceHub>().characterClassManager.SetMuted(false);
+                        ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
+                        notActualMutedPlayers.Remove(ply.GetComponent<ReferenceHub>().GetUserId());
+                    }
+                }
+                catch (NullReferenceException e)
+                {
                 }
             }
         }
@@ -50,10 +79,23 @@ namespace NoRoleMute
 
         internal void PlyJoin(PlayerJoinEvent ev)
         {
+            Timing.RunCoroutine(CheckMuteLate());
+        }
+
+        private IEnumerator<float> CheckMuteLate()
+        {
+            yield return Timing.WaitForSeconds(0.5f);
+            //Log.Debug("Mute Time?");
             if (isMuteTime)
+            {
+                //Log.Debug("Yes");
                 MuteThem();
+            }
             else
+            {
+                //Log.Debug("No");
                 UnmuteThem();
+            }
         }
 
         internal void RACmd(ref RACommandEvent ev)
@@ -73,16 +115,36 @@ namespace NoRoleMute
         {
             foreach (var ply in PlayerManager.players)
             {
-                if (ply.GetComponent<ReferenceHub>().IsMuted())
+                try
                 {
-                    continue;
+                    //Log.Debug("\"" + ply.GetComponent<ReferenceHub>().serverRoles.MyText + "\"");
+                    if (!notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()) && (ply.GetComponent<ReferenceHub>().characterClassManager.Muted || ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted))
+                    {
+                        continue;
+                    }
+                    if (/*!notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()) && */string.IsNullOrWhiteSpace(ply.GetComponent<ReferenceHub>().serverRoles.MyText))
+                    {
+                        //Log.Debug("Temp muting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
+                        try
+                        {
+                            ply.GetComponent<ReferenceHub>().Unmute();
+                            ply.GetComponent<ReferenceHub>().Mute();
+                            ply.GetComponent<ReferenceHub>().characterClassManager.Muted = true;
+                            ply.GetComponent<ReferenceHub>().characterClassManager.SetMuted(true);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error("Unable to mute! " + e.ToString());
+                        }
+                        notActualMutedPlayers.Add(ply.GetComponent<ReferenceHub>().GetUserId());
+                        if (!notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()))
+                        {
+                            ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been muted.", false);
+                        }
+                    }
                 }
-                if (!notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()) && string.IsNullOrWhiteSpace(ply.GetComponent<ReferenceHub>().serverRoles.GetUncoloredRoleString()))
+                catch (NullReferenceException e)
                 {
-                    Log.Debug("Temp muting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
-                    ply.GetComponent<ReferenceHub>().Mute();
-                    ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been muted.", false);
-                    notActualMutedPlayers.Add(ply.GetComponent<ReferenceHub>().GetUserId());
                 }
             }
         }
