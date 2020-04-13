@@ -44,6 +44,10 @@ namespace NoRoleMute
             }
         }
 
+        internal void PlyCmd(ConsoleCommandEvent ev)
+        {
+        }
+
         internal void PlyJoin(PlayerJoinEvent ev)
         {
             if (isMuteTime)

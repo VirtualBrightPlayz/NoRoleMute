@@ -14,6 +14,12 @@ namespace NoRoleMute
 
         public override void OnDisable()
         {
+            Events.RoundEndEvent -= PLEV.RoundEnd;
+            Events.RoundStartEvent -= PLEV.RoundStart;
+            Events.WaitingForPlayersEvent -= PLEV.RoundWait;
+            Events.RemoteAdminCommandEvent -= PLEV.RACmd;
+            Events.PlayerJoinEvent -= PLEV.PlyJoin;
+            Events.ConsoleCommandEvent -= PLEV.PlyCmd;
             PLEV = null;
         }
 
@@ -25,6 +31,7 @@ namespace NoRoleMute
             Events.WaitingForPlayersEvent += PLEV.RoundWait;
             Events.RemoteAdminCommandEvent += PLEV.RACmd;
             Events.PlayerJoinEvent += PLEV.PlyJoin;
+            Events.ConsoleCommandEvent += PLEV.PlyCmd;
         }
 
         public override void OnReload()
