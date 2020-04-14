@@ -65,7 +65,7 @@ namespace NoRoleMute
                         ply.GetComponent<ReferenceHub>().characterClassManager.Muted = false;
                         ply.GetComponent<ReferenceHub>().characterClassManager.SetMuted(false);
                         notActualMutedPlayers.Remove(ply.GetComponent<ReferenceHub>().GetUserId());
-                        ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
+                        //ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
                     }
                 }
                 catch (NullReferenceException e)
@@ -140,7 +140,7 @@ namespace NoRoleMute
                         notActualMutedPlayers.Add(ply.GetComponent<ReferenceHub>().GetUserId());
                         if (!notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()))
                         {
-                            ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been muted.", false);
+                            //ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been muted.", false);
                         }
                     }
                 }
