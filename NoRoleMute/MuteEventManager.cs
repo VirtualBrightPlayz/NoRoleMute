@@ -123,9 +123,9 @@ namespace NoRoleMute
                     {
                         continue;
                     }
-                    if (/*!notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()) && */string.IsNullOrWhiteSpace(ply.GetComponent<ReferenceHub>().serverRoles.MyText))
+                    if (ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.mute") && !ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted/*!notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()) && *//*string.IsNullOrWhiteSpace(ply.GetComponent<ReferenceHub>().serverRoles.MyText)*/)
                     {
-                        //Log.Debug("Temp muting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
+                        Log.Debug("Temp muting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
                         try
                         {
                             ply.GetComponent<ReferenceHub>().Unmute();
@@ -142,6 +142,11 @@ namespace NoRoleMute
                         {
                             //ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been muted.", false);
                         }
+                    }
+                    if (!ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.mute") && ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted)
+                    {
+                        ply.GetComponent<ReferenceHub>().Unmute();
+                        notActualMutedPlayers.Remove(ply.GetComponent<ReferenceHub>().GetUserId());
                     }
                 }
                 catch (NullReferenceException e)
