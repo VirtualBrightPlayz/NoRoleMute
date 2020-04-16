@@ -10,7 +10,7 @@ namespace NoRoleMute
     {
         public MutePlugin plugin;
         public static List<string> notActualMutedPlayers = new List<string>();
-        bool isMuteTime = true;
+        public static bool isMuteTime = true;
 
         public MuteEventManager(MutePlugin pl)
         {
@@ -29,10 +29,11 @@ namespace NoRoleMute
                 if (isMuteTime)
                 {
                     //Log.Debug("Yes");
-                    MuteThem();
+                    MuteAllThem();
                 }
                 else
                 {
+                    UnmuteAllThem();
                     break;
                     //Log.Debug("No");
                     //UnmuteThem();
@@ -43,16 +44,48 @@ namespace NoRoleMute
         internal void RoundEnd()
         {
             isMuteTime = true;
-            MuteThem();
+            MuteAllThem();
+            Timing.RunCoroutine(CheckMuteLateCont());
         }
 
         internal void RoundStart()
         {
             isMuteTime = false;
-            UnmuteThem();
+            UnmuteAllThem();
+            notActualMutedPlayers.Clear();
         }
 
-        public void UnmuteThem()
+        public void MuteAllThem()
+        {
+            foreach (var player in PlayerManager.players)
+            {
+                if (isMuteTime)
+                {
+                    CheckMute(player.GetPlayer());
+                }
+                else
+                {
+                    CheckUnmute(player.GetPlayer());
+                }
+            }
+        }
+
+        public void UnmuteAllThem()
+        {
+            foreach (var player in PlayerManager.players)
+            {
+                if (isMuteTime)
+                {
+                    CheckMute(player.GetPlayer());
+                }
+                else
+                {
+                    CheckUnmute(player.GetPlayer());
+                }
+            }
+        }
+
+        /*public void UnmuteThem()
         {
             foreach (var ply in PlayerManager.players)
             {
@@ -72,7 +105,7 @@ namespace NoRoleMute
                 {
                 }
             }
-        }
+        }*/
 
         internal void PlyCmd(ConsoleCommandEvent ev)
         {
@@ -80,22 +113,31 @@ namespace NoRoleMute
 
         internal void PlyJoin(PlayerJoinEvent ev)
         {
-            Timing.RunCoroutine(CheckMuteLate());
+            Timing.RunCoroutine(CheckMuteLate(ev.Player));
         }
 
-        private IEnumerator<float> CheckMuteLate()
+        private IEnumerator<float> CheckMuteLate(ReferenceHub ply)
         {
-            yield return Timing.WaitForSeconds(0.5f);
-            //Log.Debug("Mute Time?");
+            yield return Timing.WaitForSeconds(1.2f);
+            Log.Debug("Mute Time?");
             if (isMuteTime)
             {
-                //Log.Debug("Yes");
-                MuteThem();
+                Log.Debug("Yes");
+                try
+                {
+                    CheckMute(ply);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e.ToString());
+                }
+                //MuteThem();
             }
             else
             {
-                //Log.Debug("No");
-                UnmuteThem();
+                Log.Debug("No");
+                CheckUnmute(ply);
+                //UnmuteThem();
             }
         }
 
@@ -112,18 +154,57 @@ namespace NoRoleMute
             }
         }
 
-        public void MuteThem()
+        public void CheckMute(ReferenceHub ply)
+        {
+            if (ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.unmute") && notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()) && ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted)
+            {
+                ply.GetComponent<ReferenceHub>().Unmute();
+                ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
+                notActualMutedPlayers.RemoveAll((p) => p.Equals(ply.GetComponent<ReferenceHub>().GetUserId()));
+            }
+            if (ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted)
+            {
+                return;
+            }
+            if (!ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.unmute") && !notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()))
+            {
+                Log.Debug("Temp muting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
+                ply.GetComponent<ReferenceHub>().Unmute();
+                ply.GetComponent<ReferenceHub>().Mute();
+                notActualMutedPlayers.Add(ply.GetComponent<ReferenceHub>().GetUserId());
+                ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been muted.", false);
+            }
+            if (ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.unmute") && notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()))
+            {
+                ply.GetComponent<ReferenceHub>().Unmute();
+                ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
+                notActualMutedPlayers.RemoveAll((p) => p.Equals(ply.GetComponent<ReferenceHub>().GetUserId()));
+            }
+        }
+
+        public void CheckUnmute(ReferenceHub ply)
+        {
+            if (notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()))
+            {
+                Log.Debug("Unmuting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
+                ply.GetComponent<ReferenceHub>().Unmute();
+                notActualMutedPlayers.RemoveAll((p) => p.Equals(ply.GetComponent<ReferenceHub>().GetUserId()));
+                ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
+            }
+        }
+
+        /*public void MuteThem()
         {
             foreach (var ply in PlayerManager.players)
             {
                 try
                 {
                     //Log.Debug("\"" + ply.GetComponent<ReferenceHub>().serverRoles.MyText + "\"");
-                    if (!notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()) && (ply.GetComponent<ReferenceHub>().characterClassManager.Muted || ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted))
+                    if (ply.GetComponent<ReferenceHub>().characterClassManager.Muted || ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted)
                     {
                         continue;
                     }
-                    if (ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.mute") && !ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted/*!notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()) && *//*string.IsNullOrWhiteSpace(ply.GetComponent<ReferenceHub>().serverRoles.MyText)*/)
+                    if (!ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.unmute") && !ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted/*!notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()) && *//*string.IsNullOrWhiteSpace(ply.GetComponent<ReferenceHub>().serverRoles.MyText)*)
                     {
                         Log.Debug("Temp muting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
                         try
@@ -143,7 +224,7 @@ namespace NoRoleMute
                             //ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been muted.", false);
                         }
                     }
-                    if (!ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.mute") && ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted)
+                    if (ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.unmute") && ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted)
                     {
                         ply.GetComponent<ReferenceHub>().Unmute();
                         notActualMutedPlayers.Remove(ply.GetComponent<ReferenceHub>().GetUserId());
@@ -153,12 +234,12 @@ namespace NoRoleMute
                 {
                 }
             }
-        }
+        }*/
 
         internal void RoundWait()
         {
             isMuteTime = true;
-            MuteThem();
+            //MuteThem();
             Timing.RunCoroutine(CheckMuteLateCont());
         }
     }

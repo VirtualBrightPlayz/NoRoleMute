@@ -14,6 +14,8 @@ namespace NoRoleMute
 
         public override void OnDisable()
         {
+            if (!Config.GetBool("no_role_mute_enable"))
+                return;
             Events.RoundEndEvent -= PLEV.RoundEnd;
             Events.RoundStartEvent -= PLEV.RoundStart;
             Events.WaitingForPlayersEvent -= PLEV.RoundWait;
@@ -25,6 +27,8 @@ namespace NoRoleMute
 
         public override void OnEnable()
         {
+            if (!Config.GetBool("no_role_mute_enable"))
+                return;
             PLEV = new MuteEventManager(this);
             Events.RoundEndEvent += PLEV.RoundEnd;
             Events.RoundStartEvent += PLEV.RoundStart;
