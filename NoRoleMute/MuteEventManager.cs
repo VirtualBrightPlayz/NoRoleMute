@@ -24,7 +24,6 @@ namespace NoRoleMute
         {
             while (true)
             {
-                yield return Timing.WaitForSeconds(1f);
                 //Log.Debug("Mute Time?");
                 if (isMuteTime)
                 {
@@ -38,6 +37,7 @@ namespace NoRoleMute
                     //Log.Debug("No");
                     //UnmuteThem();
                 }
+                yield return Timing.WaitForSeconds(5f);
             }
         }
 
