@@ -11,6 +11,7 @@ namespace NoRoleMute
     {
         internal MuteEventManager PLEV;
         public override string getName => "NoRoleMute";
+        internal bool debug = false;
 
         public override void OnDisable()
         {
@@ -36,6 +37,7 @@ namespace NoRoleMute
             Events.RemoteAdminCommandEvent += PLEV.RACmd;
             Events.PlayerJoinEvent += PLEV.PlyJoin;
             Events.ConsoleCommandEvent += PLEV.PlyCmd;
+            debug = Config.GetBool("nrm_debug");
         }
 
         public override void OnReload()

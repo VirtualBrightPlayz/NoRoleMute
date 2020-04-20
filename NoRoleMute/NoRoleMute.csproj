@@ -32,28 +32,31 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>..\..\..\..\Downloads\exiled1.9.15\Plugins\dependencies\0Harmony.dll</HintPath>
+      <HintPath>..\..\exiledlibs\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\..\Downloads\exiled1.9.15\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\exiledlibs\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>D:\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\exiledlibs\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp_publicized">
+      <HintPath>..\..\exiledlibs\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
     <Reference Include="EXILED">
-      <HintPath>..\..\..\..\Downloads\exiled1.9.15\EXILED\EXILED.dll</HintPath>
+      <HintPath>..\..\exiledlibs\EXILED.dll</HintPath>
     </Reference>
     <Reference Include="EXILED_Events">
-      <HintPath>..\..\..\..\Downloads\exiled1.9.15\Plugins\EXILED_Events.dll</HintPath>
+      <HintPath>..\..\exiledlibs\EXILED_Events.dll</HintPath>
     </Reference>
     <Reference Include="EXILED_Idler">
-      <HintPath>..\..\..\..\Downloads\exiled1.9.15\Plugins\EXILED_Idler.dll</HintPath>
+      <HintPath>..\..\exiledlibs\EXILED_Idler.dll</HintPath>
     </Reference>
     <Reference Include="EXILED_Permissions">
-      <HintPath>..\..\..\..\Downloads\exiled1.9.15\Plugins\EXILED_Permissions.dll</HintPath>
+      <HintPath>..\..\exiledlibs\EXILED_Permissions.dll</HintPath>
     </Reference>
     <Reference Include="Mirror">
-      <HintPath>D:\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Mirror.dll</HintPath>
+      <HintPath>..\..\exiledlibs\Mirror.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -64,13 +67,16 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>D:\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\exiledlibs\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>D:\SteamLibrary\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\exiledlibs\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\..\exiledlibs\UnityEngine.PhysicsModule.dll</HintPath>
     </Reference>
     <Reference Include="YamlDotNet">
-      <HintPath>..\..\..\..\Downloads\exiled1.9.15\Plugins\dependencies\YamlDotNet.dll</HintPath>
+      <HintPath>..\..\exiledlibs\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

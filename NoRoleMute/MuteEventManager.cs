@@ -158,6 +158,8 @@ namespace NoRoleMute
         {
             if (ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.unmute") && notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()) && ply.GetComponent<ReferenceHub>().characterClassManager.NetworkMuted)
             {
+                if (plugin.debug)
+                    Log.Info("Player " + ply.GetComponent<ReferenceHub>().GetNickname() + " has a role, unmuting them.");
                 ply.GetComponent<ReferenceHub>().Unmute();
                 ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
                 notActualMutedPlayers.RemoveAll((p) => p.Equals(ply.GetComponent<ReferenceHub>().GetUserId()));
@@ -168,7 +170,8 @@ namespace NoRoleMute
             }
             if (!ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.unmute") && !notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()))
             {
-                Log.Debug("Temp muting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
+                if (plugin.debug)
+                    Log.Info("Temp muting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
                 ply.GetComponent<ReferenceHub>().Unmute();
                 ply.GetComponent<ReferenceHub>().Mute();
                 notActualMutedPlayers.Add(ply.GetComponent<ReferenceHub>().GetUserId());
@@ -176,6 +179,8 @@ namespace NoRoleMute
             }
             if (ply.GetComponent<ReferenceHub>().CheckPermission("norolemute.unmute") && notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()))
             {
+                if (plugin.debug)
+                    Log.Info("Player " + ply.GetComponent<ReferenceHub>().GetNickname() + " has a role, unmuting them.");
                 ply.GetComponent<ReferenceHub>().Unmute();
                 ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
                 notActualMutedPlayers.RemoveAll((p) => p.Equals(ply.GetComponent<ReferenceHub>().GetUserId()));
@@ -186,7 +191,8 @@ namespace NoRoleMute
         {
             if (notActualMutedPlayers.Contains(ply.GetComponent<ReferenceHub>().GetUserId()))
             {
-                Log.Debug("Unmuting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
+                if (plugin.debug)
+                    Log.Info("Unmuting player " + ply.GetComponent<ReferenceHub>().GetNickname() + " as they have no role.");
                 ply.GetComponent<ReferenceHub>().Unmute();
                 notActualMutedPlayers.RemoveAll((p) => p.Equals(ply.GetComponent<ReferenceHub>().GetUserId()));
                 ply.GetComponent<ReferenceHub>().Broadcast(3, "[NoRoleMute] You have been unmuted.", false);
